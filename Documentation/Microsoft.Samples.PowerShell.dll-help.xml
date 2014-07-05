@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-16"?>
+<helpItems xmlns="http://msh" schema="maml">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/1" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:gl="http://schemas.sitecorepowershellextensions.com/maml/gl/2013/02" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10">
+    <command:details>
+      <command:name>Get-Proc</command:name>
+      <gl:group>Proc</gl:group>
+      <maml:description>
+        <maml:para>Something clever.
+
+</maml:para>
+      </maml:description>
+      <maml:copyright>
+        <maml:para>Copyright ©  2014 </maml:para>
+      </maml:copyright>
+      <command:verb>Get</command:verb>
+      <command:noun>Proc</command:noun>
+      <dev:version>1.0.0.0</dev:version>
+    </command:details>
+    <maml:description>
+      <maml:para />
+      <maml:para />
+      <maml:para>Copyright ©  2014 </maml:para>
+    </maml:description>
+    <command:syntax />
+    <command:parameters />
+    <command xmlns="inputTypes" />
+    <command xmlns="returnValues" />
+    <command:terminatingErrors />
+    <command:nonTerminatingErrors />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para />
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples />
+  </command:command>
+</helpItems>

@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerShell.MamlGenerator", "PowerShell.MamlGenerator\PowerShell.MamlGenerator.csproj", "{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runner", "Runner\Runner.csproj", "{C3F96A49-2E99-4DDB-998B-4F74EF697811}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Samples.PowerShell", "Microsoft.Samples.PowerShell\Microsoft.Samples.PowerShell.csproj", "{A5B0CAB9-C880-470A-9EDD-907A0B21A474}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugFoundation|Any CPU = DebugFoundation|Any CPU
+		DebugMOSS|Any CPU = DebugMOSS|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseFoundation|Any CPU = ReleaseFoundation|Any CPU
+		ReleaseMOSS|Any CPU = ReleaseMOSS|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.Debug|Any CPU.ActiveCfg = DebugFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.Debug|Any CPU.Build.0 = DebugFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.DebugFoundation|Any CPU.ActiveCfg = DebugFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.DebugFoundation|Any CPU.Build.0 = DebugFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.DebugMOSS|Any CPU.ActiveCfg = DebugMOSS|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.DebugMOSS|Any CPU.Build.0 = DebugMOSS|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.Release|Any CPU.ActiveCfg = ReleaseFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.Release|Any CPU.Build.0 = ReleaseFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.ReleaseFoundation|Any CPU.ActiveCfg = ReleaseFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.ReleaseFoundation|Any CPU.Build.0 = ReleaseFoundation|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.ReleaseMOSS|Any CPU.ActiveCfg = ReleaseMOSS|Any CPU
+		{E4CA890C-49C0-4B13-991A-A1541ADFBFA8}.ReleaseMOSS|Any CPU.Build.0 = ReleaseMOSS|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.DebugFoundation|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.DebugFoundation|Any CPU.Build.0 = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.DebugMOSS|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.DebugMOSS|Any CPU.Build.0 = Debug|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.ReleaseFoundation|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.ReleaseFoundation|Any CPU.Build.0 = Release|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.ReleaseMOSS|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F96A49-2E99-4DDB-998B-4F74EF697811}.ReleaseMOSS|Any CPU.Build.0 = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.DebugFoundation|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.DebugFoundation|Any CPU.Build.0 = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.DebugMOSS|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.DebugMOSS|Any CPU.Build.0 = Debug|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.ReleaseFoundation|Any CPU.ActiveCfg = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.ReleaseFoundation|Any CPU.Build.0 = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.ReleaseMOSS|Any CPU.ActiveCfg = Release|Any CPU
+		{A5B0CAB9-C880-470A-9EDD-907A0B21A474}.ReleaseMOSS|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
