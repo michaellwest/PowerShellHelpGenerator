@@ -9,9 +9,19 @@ namespace Microsoft.Samples.PowerShell.Commands
     /// <summary>
     /// This class implements the Get-Proc cmdlet.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, "Proc")]
+    [Cmdlet(VerbsCommon.Get, "Proc", DefaultParameterSetName = "Id")]
     public class GetProcCommand : Cmdlet
     {
+        [Parameter(ParameterSetName = "Id")]
+        [Parameter(ParameterSetName = "OneOnly")]
+        public int Id { get; set; }
+
+        [Parameter(ParameterSetName = "OneOnly")]
+        public SwitchParameter OneOnly { get; set; }
+
+        [Parameter]
+        public SwitchParameter DoNothing { get; set; }
+
         #region Cmdlet Overrides
 
         /// <summary>

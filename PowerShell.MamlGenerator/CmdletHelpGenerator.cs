@@ -38,7 +38,7 @@ namespace PowerShell.MamlGenerator
                     Token[] tokens = null;
                     ParseError[] errors;
                     var help = Parser.ParseFile(input, out tokens, out errors).GetHelpContent();
-                    if(help == null) continue;
+                    if (help == null) continue;
 
                     comments.Add(Path.GetFileNameWithoutExtension(fInfo.Name), help);
                 }
@@ -216,21 +216,22 @@ namespace PowerShell.MamlGenerator
 
                 foreach (var temp in pas)
                 {
-                    var set = temp.ParameterSetName + "";
-                    List<PropertyInfo> piList = null;
+                    var set = temp.ParameterSetName;
                     if (!parameterSets.ContainsKey(set))
                     {
-                        piList = new List<PropertyInfo>();
+                        var piList = new List<PropertyInfo>();
                         parameterSets.Add(set, piList);
                     }
-                    else
-                        piList = parameterSets[set];
+
                     parameterSets[set].Add(pi);
                 }
             }
 
             if (parameterSets.Count > 1 && parameterSets.ContainsKey(DEFAULT_PARAMETER_SET_NAME))
+            {
+                defaultSet = parameterSets[DEFAULT_PARAMETER_SET_NAME];
                 parameterSets.Remove(DEFAULT_PARAMETER_SET_NAME);
+            }
 
             _writer.WriteStartElement("command", "syntax", null);
             foreach (var parameterSetName in parameterSets.Keys)
