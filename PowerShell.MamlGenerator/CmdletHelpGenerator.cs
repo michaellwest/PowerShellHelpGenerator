@@ -33,20 +33,18 @@ namespace PowerShell.MamlGenerator
             foreach (var input in inputFiles)
             {
                 var fInfo = new FileInfo(input);
-                if (fInfo.Exists)
-                {
-                    Token[] tokens = null;
-                    ParseError[] errors;
-                    var help = Parser.ParseFile(input, out tokens, out errors).GetHelpContent();
-                    if (help == null) continue;
+                if (!fInfo.Exists) continue;
 
-                    comments.Add(Path.GetFileNameWithoutExtension(fInfo.Name), help);
-                }
+                Token[] tokens;
+                ParseError[] errors;
+                var help = Parser.ParseFile(input, out tokens, out errors).GetHelpContent();
+                if (help == null) continue;
+
+                comments.Add(Path.GetFileNameWithoutExtension(fInfo.Name), help);
             }
 
             var sb = new StringBuilder();
-            _writer = new XmlTextWriter(new StringWriter(sb));
-            _writer.Formatting = Formatting.Indented;
+            _writer = new XmlTextWriter(new StringWriter(sb)) {Formatting = Formatting.Indented};
 
             _writer.WriteStartDocument();
             _writer.WriteStartElement("helpItems");
@@ -78,7 +76,7 @@ namespace PowerShell.MamlGenerator
                 //else
                 _writer.WriteElementString("gl", "group", null, ca.NounName);
 
-                WriteDescription(type, true, false, commentHelpInfo);
+                WriteDescription(true, false, commentHelpInfo);
 
                 WriteCopyright();
 
@@ -89,7 +87,7 @@ namespace PowerShell.MamlGenerator
 
                 _writer.WriteEndElement(); //command:details
 
-                WriteDescription(type, false, true, commentHelpInfo);
+                WriteDescription(false, true, commentHelpInfo);
 
                 WriteSyntax(ca, type, commentHelpInfo);
 
@@ -115,7 +113,7 @@ namespace PowerShell.MamlGenerator
                                 defaultSet = string.Empty;
 
                             var set = temp.ParameterSetName;
-                            if (string.IsNullOrEmpty(set) || set == DEFAULT_PARAMETER_SET_NAME)
+                            if (string.IsNullOrEmpty(set) || set == DefaultParameterSetName)
                             {
                                 set = string.Empty;
                                 defaultPA = temp;
@@ -188,8 +186,8 @@ namespace PowerShell.MamlGenerator
 
                 WriteNotes(commentHelpInfo);
 
-                WriteExamples(type, commentHelpInfo);
-                WriteRelatedLinks(type);
+                WriteExamples(commentHelpInfo);
+                WriteRelatedLinks(commentHelpInfo);
 
                 _writer.WriteEndElement(); //command:command
             }
@@ -201,7 +199,7 @@ namespace PowerShell.MamlGenerator
                 sb.ToString());
         }
 
-        private const string DEFAULT_PARAMETER_SET_NAME = "__AllParameterSets";
+        private const string DefaultParameterSetName = "__AllParameterSets";
 
         private static void WriteSyntax(CmdletAttribute ca, Type type, CommentHelpInfo comment)
         {
@@ -227,22 +225,22 @@ namespace PowerShell.MamlGenerator
                 }
             }
 
-            if (parameterSets.Count > 1 && parameterSets.ContainsKey(DEFAULT_PARAMETER_SET_NAME))
+            if (parameterSets.Count > 1 && parameterSets.ContainsKey(DefaultParameterSetName))
             {
-                defaultSet = parameterSets[DEFAULT_PARAMETER_SET_NAME];
-                parameterSets.Remove(DEFAULT_PARAMETER_SET_NAME);
+                defaultSet = parameterSets[DefaultParameterSetName];
+                parameterSets.Remove(DefaultParameterSetName);
             }
 
             _writer.WriteStartElement("command", "syntax", null);
             foreach (var parameterSetName in parameterSets.Keys)
             {
-                WriteSyntaxItem(ca, parameterSets, parameterSetName, defaultSet, comment);
+                WriteSyntaxItem(ca, parameterSets, parameterSetName, defaultSet);
             }
             _writer.WriteEndElement(); //command:syntax
         }
 
         private static void WriteSyntaxItem(CmdletAttribute ca, Dictionary<string, List<PropertyInfo>> parameterSets,
-            string parameterSetName, List<PropertyInfo> defaultSet, CommentHelpInfo comment)
+            string parameterSetName, IEnumerable<PropertyInfo> defaultSet)
         {
             _writer.WriteStartElement("command", "syntaxItem", null);
             _writer.WriteElementString("maml", "name", null, string.Format("{0}-{1}", ca.VerbName, ca.NounName));
@@ -252,7 +250,7 @@ namespace PowerShell.MamlGenerator
                 if (pa == null)
                     continue;
 
-                WriteParameter(pi, pa, comment);
+                WriteParameter(pi, pa);
             }
             if (defaultSet != null)
             {
@@ -261,7 +259,7 @@ namespace PowerShell.MamlGenerator
                     var pas = GetAttribute<ParameterAttribute>(pi);
                     if (pas == null)
                         continue;
-                    WriteParameter(pi, pas[0], comment);
+                    WriteParameter(pi, pas[0]);
                 }
             }
             _writer.WriteEndElement(); //command:syntaxItem
@@ -284,7 +282,7 @@ namespace PowerShell.MamlGenerator
             return pa;
         }
 
-        private static void WriteParameter(PropertyInfo pi, ParameterAttribute pa, CommentHelpInfo comment)
+        private static void WriteParameter(PropertyInfo pi, ParameterAttribute pa)
         {
             _writer.WriteStartElement("command", "parameter", null);
             _writer.WriteAttributeString("required", pa.Mandatory.ToString().ToLower());
@@ -331,7 +329,7 @@ namespace PowerShell.MamlGenerator
             _writer.WriteEndElement(); //dev:type
         }
 
-        private static void WriteDescription(Type type, bool synopsis, bool addCopyright, CommentHelpInfo comment)
+        private static void WriteDescription(bool synopsis, bool addCopyright, CommentHelpInfo comment)
         {
             _writer.WriteStartElement("maml", "description", null);
 
@@ -363,7 +361,7 @@ namespace PowerShell.MamlGenerator
             _writer.WriteEndElement(); //maml:description
         }
 
-        private static void WriteExamples(Type type, CommentHelpInfo comment)
+        private static void WriteExamples(CommentHelpInfo comment)
         {
             if (comment.Examples == null || comment.Examples.Count == 0)
             {
@@ -449,12 +447,9 @@ namespace PowerShell.MamlGenerator
             _writer.WriteEndElement(); //maml:alertSet
         }
 
-        private static void WriteRelatedLinks(Type type)
+        private static void WriteRelatedLinks(CommentHelpInfo comment)
         {
-            /*
-            var attr = GetAttribute<RelatedCmdletsAttribute>(type);
-
-            if (attr == null)
+            if (comment.Links == null || comment.Links.Count == 0)
             {
                 _writer.WriteElementString("maml", "relatedLinks", null, null);
             }
@@ -462,29 +457,15 @@ namespace PowerShell.MamlGenerator
             {
                 _writer.WriteStartElement("maml", "relatedLinks", null);
 
-                foreach (Type t in attr.RelatedCmdlets)
+                foreach (var link in comment.Links)
                 {
-                    var ca = GetAttribute<CmdletAttribute>(t);
-                    if (ca == null)
-                        continue;
-
                     _writer.WriteStartElement("maml", "navigationLink", null);
-                    _writer.WriteElementString("maml", "linkText", null, ca.VerbName + "-" + ca.NounName);
+                    _writer.WriteElementString("maml", "linkText", null, link);
                     _writer.WriteElementString("maml", "uri", null, null);
                     _writer.WriteEndElement(); //maml:navigationLink
                 }
-                if (attr.ExternalCmdlets != null)
-                {
-                    foreach (string s in attr.ExternalCmdlets)
-                    {
-                        _writer.WriteStartElement("maml", "navigationLink", null);
-                        _writer.WriteElementString("maml", "linkText", null, s);
-                        _writer.WriteElementString("maml", "uri", null, null);
-                        _writer.WriteEndElement(); //maml:navigationLink
-                    }
-                }
                 _writer.WriteEndElement(); //maml:relatedLinks
-            }*/
+            }
         }
 
         private static T GetAttribute<T>(Type type)

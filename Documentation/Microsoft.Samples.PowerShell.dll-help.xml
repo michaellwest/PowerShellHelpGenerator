@@ -103,5 +103,11 @@
       </maml:alert>
     </maml:alertSet>
     <command:examples />
+    <maml:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Set-Proc</maml:linkText>
+        <maml:uri />
+      </maml:navigationLink>
+    </maml:relatedLinks>
   </command:command>
 </helpItems>
