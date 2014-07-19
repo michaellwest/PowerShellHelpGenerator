@@ -14,7 +14,7 @@
       </maml:copyright>
       <command:verb>Get</command:verb>
       <command:noun>Proc</command:noun>
-      <dev:version>1.0.0.0</dev:version>
+      <dev:version>1.0.0</dev:version>
     </command:details>
     <maml:description>
       <maml:para />

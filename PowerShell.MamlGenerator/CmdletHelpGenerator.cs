@@ -83,7 +83,7 @@ namespace PowerShell.MamlGenerator
                 _writer.WriteElementString("command", "verb", null, ca.VerbName);
                 _writer.WriteElementString("command", "noun", null, ca.NounName);
 
-                _writer.WriteElementString("dev", "version", null, asm.GetName().Version.ToString());
+                _writer.WriteElementString("dev", "version", null, asm.GetName().Version.ToString(3));
 
                 _writer.WriteEndElement(); //command:details
 
