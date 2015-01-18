@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Reflection;
@@ -381,10 +382,45 @@ namespace PowerShell.MamlGenerator
                         _writer.WriteElementString("maml", "title", null,
                             string.Format("------------------EXAMPLE {0}-----------------------", i + 1));
 
-                    _writer.WriteElementString("dev", "code", null, ex);
-                    _writer.WriteStartElement("dev", "remarks", null);
-                    //WritePara(ex.Remarks);
-                    _writer.WriteEndElement(); //dev:remarks
+                    string[] exampleLines = ex.Split('\n');
+                    List<string> remarks = new List<string>();
+                    List<string> code = new List<string>();
+                    bool codeLineFound = false;
+                    foreach (var line in exampleLines)
+                    {
+                        if (!codeLineFound && line.TrimStart().StartsWith("#"))
+                        {
+                            remarks.Add(line.TrimStart('#',' '));
+                        }
+                        else
+                        {
+                            codeLineFound = true;
+                            code.Add(line);
+                        }
+                    }
+                    if (code.Count > 0)
+                    {
+                        _writer.WriteElementString("dev", "code", null,
+                            code.Aggregate((final, part) => final + "\n" + part));
+                    }
+                    else
+                    {
+                        _writer.WriteStartElement("dev", "code", null);
+                        //WritePara(ex.Remarks);
+                        _writer.WriteEndElement(); //dev:remarks
+                        
+                    }
+                    if (remarks.Count > 0)
+                    {
+                        _writer.WriteElementString("dev", "remarks", null,
+                            remarks.Aggregate((final, part) => final + "\n" + part));
+                    }
+                    else
+                    {
+                        _writer.WriteStartElement("dev", "remarks", null);
+                        //WritePara(ex.Remarks);
+                        _writer.WriteEndElement(); //dev:remarks
+                    } 
                     _writer.WriteEndElement(); //command:example
                 }
                 _writer.WriteEndElement(); //command:examples
