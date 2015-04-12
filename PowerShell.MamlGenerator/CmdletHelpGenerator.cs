@@ -343,7 +343,6 @@ namespace PowerShell.MamlGenerator
             WritePara(desc);
             if (addCopyright)
             {
-                WritePara(null);
                 WritePara(_copyright);
             }
 
