@@ -329,6 +329,29 @@ namespace PowerShell.MamlGenerator
             WriteDescription(description, false);
             _writer.WriteEndElement(); //dev:type
         }
+        private static void WriteDevType(string textToSplit)
+        {
+            string[] exampleLines = textToSplit.Split('\n');
+            List<string> description = new List<string>();
+            List<string> code = new List<string>();
+            bool descriptionLineFound = false;
+            
+            foreach (var line in exampleLines)
+            {
+                if (!descriptionLineFound && !line.TrimStart().StartsWith("#"))
+                {
+                    code.Add(line);
+                }
+                else
+                {
+                    descriptionLineFound = true;
+                    description.Add(line.TrimStart('#', ' '));
+                }
+            }
+            WriteDevType(code.Count == 0 ? string.Empty : code.Aggregate((final, part) => final + "\n" + part), null);
+            WriteDescription(description.Count == 0 ? string.Empty : description.Aggregate((final, part) => final + "\n" + part), false);
+        }
+
 
         private static void WriteDescription(bool synopsis, bool addCopyright, CommentHelpInfo comment)
         {
@@ -380,6 +403,7 @@ namespace PowerShell.MamlGenerator
                     else
                         _writer.WriteElementString("maml", "title", null,
                             string.Format("------------------EXAMPLE {0}-----------------------", i + 1));
+
 
                     string[] exampleLines = ex.Split('\n');
                     List<string> remarks = new List<string>();
@@ -438,8 +462,9 @@ namespace PowerShell.MamlGenerator
                 foreach (var input in comment.Inputs)
                 {
                     _writer.WriteStartElement("command", "inputType", null);
-                    //WriteDevType(null, null);
-                    WriteDescription(input, false);
+
+                    WriteDevType(input);
+                    //WriteDescription(input, false);
                     _writer.WriteEndElement(); //command:inputType
                 }
                 _writer.WriteEndElement(); //command:inputTypes
@@ -455,11 +480,11 @@ namespace PowerShell.MamlGenerator
             else
             {
                 _writer.WriteStartElement("command", "returnValues", null);
-                foreach (var input in comment.Inputs)
+                foreach (var output in comment.Outputs)
                 {
                     _writer.WriteStartElement("command", "returnValue", null);
-                    //WriteDevType(null, null);
-                    WriteDescription(input, false);
+                    WriteDevType(output);
+                    //WriteDescription(input, false);
                     _writer.WriteEndElement(); //command:returnValue
                 }
                 _writer.WriteEndElement(); //command:returnValues
