@@ -12,6 +12,7 @@ namespace PowerShell.MamlGenerator
 {
     public class CmdletHelpGenerator
     {
+        private const string DefaultParameterSetName = "__AllParameterSets";
         private static string _copyright;
 
         private static XmlTextWriter _writer;
@@ -23,14 +24,14 @@ namespace PowerShell.MamlGenerator
 
         public static void GenerateHelp(Assembly asm, string outputPath, string[] inputFiles)
         {
-            var attr = asm.GetCustomAttributes(typeof (AssemblyCopyrightAttribute), false);
+            var attr = asm.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
             if (attr.Length == 1)
                 _copyright = ((AssemblyCopyrightAttribute) attr[0]).Copyright;
-            attr = asm.GetCustomAttributes(typeof (AssemblyDescriptionAttribute), false);
+            attr = asm.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
             if (attr.Length == 1)
                 _copyright += " " + ((AssemblyDescriptionAttribute) attr[0]).Description;
 
-            var comments = new Dictionary<string, CommentHelpInfo>();
+            var comments = new Dictionary<string, CommentHelpInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var input in inputFiles)
             {
                 var fInfo = new FileInfo(input);
@@ -57,7 +58,7 @@ namespace PowerShell.MamlGenerator
                 var ca = GetAttribute<CmdletAttribute>(type);
                 if (ca == null) continue;
 
-                var commandName = String.Format("{0}-{1}", ca.VerbName, ca.NounName);
+                var commandName = string.Format("{0}-{1}", ca.VerbName, ca.NounName);
                 var commentHelpInfo = comments.ContainsKey(commandName) ? comments[commandName] : new CommentHelpInfo();
 
                 _writer.WriteStartElement("command", "command",
@@ -102,7 +103,9 @@ namespace PowerShell.MamlGenerator
 
                     ParameterAttribute pa = null;
                     if (pas.Count == 1)
+                    {
                         pa = pas[0];
+                    }
                     else
                     {
                         // Determine the defualt property parameter set to use for details.
@@ -119,12 +122,14 @@ namespace PowerShell.MamlGenerator
                                 set = string.Empty;
                                 defaultPA = temp;
                             }
+
                             if (set.ToLower() != defaultSet.ToLower()) continue;
 
                             pa = temp;
                             defaultPA = temp;
                             break;
                         }
+
                         if (pa == null && defaultPA != null)
                             pa = defaultPA;
                         if (pa == null)
@@ -157,13 +162,9 @@ namespace PowerShell.MamlGenerator
                     _writer.WriteElementString("maml", "name", null, pi.Name);
 
                     var helpMessage = pa.HelpMessage;
-                    if (String.IsNullOrEmpty(helpMessage) && commentHelpInfo.Parameters != null)
-                    {
+                    if (string.IsNullOrEmpty(helpMessage) && commentHelpInfo.Parameters != null)
                         if (commentHelpInfo.Parameters.ContainsKey(pi.Name.ToUpper()))
-                        {
                             helpMessage = commentHelpInfo.Parameters[pi.Name.ToUpper()];
-                        }
-                    }
                     WriteDescription(helpMessage, false);
 
                     _writer.WriteStartElement("command", "parameterValue", null);
@@ -176,6 +177,7 @@ namespace PowerShell.MamlGenerator
 
                     _writer.WriteEndElement(); //command:parameter
                 }
+
                 _writer.WriteEndElement(); //command:parameters
 
                 WriteInputs(commentHelpInfo);
@@ -199,8 +201,6 @@ namespace PowerShell.MamlGenerator
             File.WriteAllText(Path.Combine(outputPath, string.Format("{0}.dll-help.xml", asm.GetName().Name)),
                 sb.ToString());
         }
-
-        private const string DefaultParameterSetName = "__AllParameterSets";
 
         private static void WriteSyntax(CmdletAttribute ca, Type type, CommentHelpInfo comment)
         {
@@ -234,9 +234,7 @@ namespace PowerShell.MamlGenerator
 
             _writer.WriteStartElement("command", "syntax", null);
             foreach (var parameterSetName in parameterSets.Keys)
-            {
                 WriteSyntaxItem(ca, parameterSets, parameterSetName, defaultSet);
-            }
             _writer.WriteEndElement(); //command:syntax
         }
 
@@ -253,8 +251,8 @@ namespace PowerShell.MamlGenerator
 
                 WriteParameter(pi, pa);
             }
+
             if (defaultSet != null)
-            {
                 foreach (var pi in defaultSet)
                 {
                     var pas = GetAttribute<ParameterAttribute>(pi);
@@ -262,7 +260,7 @@ namespace PowerShell.MamlGenerator
                         continue;
                     WriteParameter(pi, pas[0]);
                 }
-            }
+
             _writer.WriteEndElement(); //command:syntaxItem
         }
 
@@ -273,13 +271,12 @@ namespace PowerShell.MamlGenerator
                 return null;
             ParameterAttribute pa = null;
             foreach (var temp in pas)
-            {
                 if (temp.ParameterSetName.ToLower() == parameterSetName.ToLower())
                 {
                     pa = temp;
                     break;
                 }
-            }
+
             return pa;
         }
 
@@ -296,7 +293,7 @@ namespace PowerShell.MamlGenerator
             _writer.WriteElementString("maml", "name", null, pi.Name);
             _writer.WriteStartElement("command", "parameterValue", null);
 
-            if (pi.DeclaringType == typeof (PSCmdlet))
+            if (pi.DeclaringType == typeof(PSCmdlet))
                 _writer.WriteAttributeString("required", "false");
             else
                 _writer.WriteAttributeString("required", "true");
@@ -329,15 +326,15 @@ namespace PowerShell.MamlGenerator
             WriteDescription(description, false);
             _writer.WriteEndElement(); //dev:type
         }
+
         private static void WriteDevType(string textToSplit)
         {
-            string[] exampleLines = textToSplit.Split('\n');
-            List<string> description = new List<string>();
-            List<string> code = new List<string>();
-            bool descriptionLineFound = false;
-            
+            var exampleLines = textToSplit.Split('\n');
+            var description = new List<string>();
+            var code = new List<string>();
+            var descriptionLineFound = false;
+
             foreach (var line in exampleLines)
-            {
                 if (!descriptionLineFound && !line.TrimStart().StartsWith("#"))
                 {
                     code.Add(line);
@@ -347,9 +344,11 @@ namespace PowerShell.MamlGenerator
                     descriptionLineFound = true;
                     description.Add(line.TrimStart('#', ' '));
                 }
-            }
+
             WriteDevType(code.Count == 0 ? string.Empty : code.Aggregate((final, part) => final + "\n" + part), null);
-            WriteDescription(description.Count == 0 ? string.Empty : description.Aggregate((final, part) => final + "\n" + part), false);
+            WriteDescription(
+                description.Count == 0 ? string.Empty : description.Aggregate((final, part) => final + "\n" + part),
+                false);
         }
 
 
@@ -358,16 +357,10 @@ namespace PowerShell.MamlGenerator
             _writer.WriteStartElement("maml", "description", null);
 
             var desc = comment.Description;
-            if (synopsis)
-            {
-                desc = comment.Synopsis;
-            }
+            if (synopsis) desc = comment.Synopsis;
 
             WritePara(desc);
-            if (addCopyright)
-            {
-                WritePara(_copyright);
-            }
+            if (addCopyright) WritePara(_copyright);
 
             _writer.WriteEndElement(); //maml:description
         }
@@ -381,6 +374,7 @@ namespace PowerShell.MamlGenerator
                 WritePara(null);
                 WritePara(_copyright);
             }
+
             _writer.WriteEndElement(); //maml:description
         }
 
@@ -399,28 +393,28 @@ namespace PowerShell.MamlGenerator
                     var ex = comment.Examples[i];
                     _writer.WriteStartElement("command", "example", null);
                     if (comment.Examples.Count == 1)
-                        _writer.WriteElementString("maml", "title", null, "------------------EXAMPLE------------------");
+                        _writer.WriteElementString("maml", "title", null,
+                            "------------------EXAMPLE------------------");
                     else
                         _writer.WriteElementString("maml", "title", null,
                             string.Format("------------------EXAMPLE {0}-----------------------", i + 1));
 
 
-                    string[] exampleLines = ex.Split('\n');
-                    List<string> remarks = new List<string>();
-                    List<string> code = new List<string>();
-                    bool codeLineFound = false;
+                    var exampleLines = ex.Split('\n');
+                    var remarks = new List<string>();
+                    var code = new List<string>();
+                    var codeLineFound = false;
                     foreach (var line in exampleLines)
-                    {
                         if (!codeLineFound && line.TrimStart().StartsWith("#"))
                         {
-                            remarks.Add(line.TrimStart('#',' '));
+                            remarks.Add(line.TrimStart('#', ' '));
                         }
                         else
                         {
                             codeLineFound = true;
                             code.Add(line);
                         }
-                    }
+
                     if (code.Count > 0)
                     {
                         _writer.WriteElementString("dev", "code", null,
@@ -431,8 +425,8 @@ namespace PowerShell.MamlGenerator
                         _writer.WriteStartElement("dev", "code", null);
                         //WritePara(ex.Remarks);
                         _writer.WriteEndElement(); //dev:remarks
-                        
                     }
+
                     if (remarks.Count > 0)
                     {
                         _writer.WriteElementString("dev", "remarks", null,
@@ -443,9 +437,11 @@ namespace PowerShell.MamlGenerator
                         _writer.WriteStartElement("dev", "remarks", null);
                         //WritePara(ex.Remarks);
                         _writer.WriteEndElement(); //dev:remarks
-                    } 
+                    }
+
                     _writer.WriteEndElement(); //command:example
                 }
+
                 _writer.WriteEndElement(); //command:examples
             }
         }
@@ -467,6 +463,7 @@ namespace PowerShell.MamlGenerator
                     //WriteDescription(input, false);
                     _writer.WriteEndElement(); //command:inputType
                 }
+
                 _writer.WriteEndElement(); //command:inputTypes
             }
         }
@@ -487,6 +484,7 @@ namespace PowerShell.MamlGenerator
                     //WriteDescription(input, false);
                     _writer.WriteEndElement(); //command:returnValue
                 }
+
                 _writer.WriteEndElement(); //command:returnValues
             }
         }
@@ -524,13 +522,14 @@ namespace PowerShell.MamlGenerator
                     _writer.WriteElementString("maml", "uri", null, null);
                     _writer.WriteEndElement(); //maml:navigationLink
                 }
+
                 _writer.WriteEndElement(); //maml:relatedLinks
             }
         }
 
         private static T GetAttribute<T>(Type type)
         {
-            var attrs = type.GetCustomAttributes(typeof (T), true);
+            var attrs = type.GetCustomAttributes(typeof(T), true);
             if (attrs == null || attrs.Length == 0)
                 return default(T);
             return (T) attrs[0];
@@ -538,15 +537,12 @@ namespace PowerShell.MamlGenerator
 
         private static List<T> GetAttribute<T>(PropertyInfo pi)
         {
-            var attrs = pi.GetCustomAttributes(typeof (T), true);
+            var attrs = pi.GetCustomAttributes(typeof(T), true);
             var attributes = new List<T>();
             if (attrs == null || attrs.Length == 0)
                 return null;
 
-            foreach (T t in attrs)
-            {
-                attributes.Add(t);
-            }
+            foreach (T t in attrs) attributes.Add(t);
             return attributes;
         }
 
@@ -564,6 +560,7 @@ namespace PowerShell.MamlGenerator
                 _writer.WriteElementString("maml", "para", null, null);
                 return;
             }
+
             var paragraphs = para.Split(new[] {"\r\n"}, StringSplitOptions.None);
             foreach (var p in paragraphs)
                 _writer.WriteElementString("maml", "para", null, p);
